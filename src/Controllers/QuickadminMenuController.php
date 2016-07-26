@@ -28,6 +28,7 @@ class QuickadminMenuController extends Controller
         $menusList = Menu::with(['children'])
             ->where('menu_type', '!=', 0)
             ->where('parent_id', null)
+            ->orWhere('parent_id', 0)
             ->orderBy('position')->get();
 
         return view('qa::menus.index', compact('menusList'));
@@ -300,7 +301,7 @@ class QuickadminMenuController extends Controller
     public function update(Request $request, $id)
     {
         $requestArray              = $request->all();
-        $requestArray['parent_id'] = (isset($requestArray['parent_id']) && !empty($requestArray['parent_id'])) ? $requestArray['parent_id'] : null;
+        $requestArray['parent_id'] = (boolean)$requestArray['parent_id'] ? $requestArray['parent_id'] : null;
         $menu                      = Menu::findOrFail($id);
         $menu->update($requestArray);
         $menu->roles()->sync($request->input('roles', []));
